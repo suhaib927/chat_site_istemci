@@ -1,4 +1,4 @@
-namespace istemci.Models
+namespace chat_site_istemci.Models
 {
     public class ErrorViewModel
     {

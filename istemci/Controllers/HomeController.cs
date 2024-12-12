@@ -1,4 +1,4 @@
-using istemci.Models;
+using chat_site_istemci.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 

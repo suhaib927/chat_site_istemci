@@ -1,0 +1,37 @@
+﻿@model chat_site_istemci.Models.Chat
+
+<div class="chat">
+    <div class="chat-header clearfix">
+        <div class="row">
+            <div class="col-lg-6">
+                <img src="@Model.ImageUrl" alt="avatar">
+                <div class="chat-about">
+                    <h6 class="m-b-0">@Model.Name</h6>
+                    <small>@Model.LastSeen</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="chat-history">
+        <ul class="m-b-0">
+            @foreach (var message in Model.Messages)
+            {
+                <li class="clearfix">
+                    <div class="message-data @message.Alignment">
+                        <span class="message-data-time">@message.Time</span>
+                        <img src="@message.UserImageUrl" alt="avatar">
+                    </div>
+                    <div class="message @message.CssClass">@message.Text</div>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="chat-message clearfix">
+        <div class="input-group mb-0">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-send"></i></span>
+            </div>
+            <input type="text" class="form-control" placeholder="Enter text here...">
+        </div>
+    </div>
+</div>
