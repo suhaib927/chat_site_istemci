@@ -1,7 +1,7 @@
 ﻿using chat_site_istemci.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace HaircutProject.Entities
+namespace chat_site_istemci.Entities
 {
     public class DatabaseContext : DbContext
     {

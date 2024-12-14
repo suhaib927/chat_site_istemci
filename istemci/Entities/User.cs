@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using chat_site_istemci.Entities;
 
 
-namespace HaircutProject.Entities
+namespace chat_site_istemci.Entities
 {
     [Table("Users")]
     public class User
