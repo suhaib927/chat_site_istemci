@@ -91,7 +91,7 @@ namespace chat_site_istemci.Controllers
                         Password = hashedPassword
                     };
                     _databaseContext.Users.Add(user);
-                    int affectedRowCount = _databaseContext.SaveChanges();
+                        int affectedRowCount = _databaseContext.SaveChanges();
 
                     if (affectedRowCount == 0)
                     {

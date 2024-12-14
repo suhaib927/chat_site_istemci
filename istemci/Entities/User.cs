@@ -12,9 +12,7 @@ namespace chat_site_istemci.Entities
         [Key]
         public Guid UserId { get; set; }
 
-        [Required]
-        [StringLength(15)]
-        public string Ip { get; set; }
+        public string Ip { get; set; } = "000.000.000.000";
 
 
         [Required]
@@ -33,6 +31,6 @@ namespace chat_site_istemci.Entities
 
         public ICollection<GroupMember> GroupMemberships { get; set; } // Groups the user belongs to
         public ICollection<Message> SentMessages { get; set; } // Messages sent by the user
-
+        
     }
 }

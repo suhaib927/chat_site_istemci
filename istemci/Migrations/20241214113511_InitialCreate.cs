@@ -31,7 +31,7 @@ namespace chat_site_istemci.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Ip = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    Ip = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true, defaultValue:"000.000.000.000"),
                     Username = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     IsOnline = table.Column<bool>(type: "bit", nullable: false),

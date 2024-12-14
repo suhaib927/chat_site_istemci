@@ -44,6 +44,11 @@ namespace chat_site_istemci.Entities
                 .WithOne(m => m.FailedMessage)
                 .HasForeignKey<FailedMessage>(fm => fm.MessageId);
 
+            modelBuilder.Entity<User>()
+    .Property(u => u.Ip)
+    .IsRequired(false); // Allow NULL values
+
+
             base.OnModelCreating(modelBuilder);
         }
     }
