@@ -1,11 +1,15 @@
 using chat_site_istemci.Services;
+using HaircutProject.Entities;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IChatService, ChatService>();
 
+builder.Services.AddDbContext<DatabaseContext>(opts => {
+    opts.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
