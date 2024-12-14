@@ -1,4 +1,4 @@
-﻿using HaircutProject.Entities;
+﻿using chat_site_istemci.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
