@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using chat_site_istemci.Entities;
 
 
-namespace HaircutProject.Entities
+namespace chat_site_istemci.Entities
 {
     [Table("Users")]
     public class User
@@ -12,9 +12,7 @@ namespace HaircutProject.Entities
         [Key]
         public Guid UserId { get; set; }
 
-        [Required]
-        [StringLength(15)]
-        public string Ip { get; set; }
+        public string Ip { get; set; } = "000.000.000.000";
 
 
         [Required]

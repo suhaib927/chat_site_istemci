@@ -1,6 +1,6 @@
 using chat_site_istemci.Entities;
 using chat_site_istemci.Services;
-using HaircutProject.Entities;
+using chat_site_istemci.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.FileProviders;

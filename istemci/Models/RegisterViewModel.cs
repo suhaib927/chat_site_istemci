@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HaircutProject.Models
+namespace chat_site_istemci.Models
 {
     public class RegisterViewModel
     {

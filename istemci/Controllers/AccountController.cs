@@ -1,6 +1,5 @@
 ﻿using chat_site_istemci.Models;
-using HaircutProject.Entities;
-using HaircutProject.Models;
+using chat_site_istemci.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -92,7 +91,7 @@ namespace chat_site_istemci.Controllers
                         Password = hashedPassword
                     };
                     _databaseContext.Users.Add(user);
-                    int affectedRowCount = _databaseContext.SaveChanges();
+                        int affectedRowCount = _databaseContext.SaveChanges();
 
                     if (affectedRowCount == 0)
                     {

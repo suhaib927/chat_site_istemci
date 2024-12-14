@@ -1,7 +1,7 @@
 ﻿using chat_site_istemci.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace HaircutProject.Entities
+namespace chat_site_istemci.Entities
 {
     public class DatabaseContext : DbContext
     {
@@ -43,6 +43,11 @@ namespace HaircutProject.Entities
                 .HasOne(fm => fm.Message)
                 .WithOne(m => m.FailedMessage)
                 .HasForeignKey<FailedMessage>(fm => fm.MessageId);
+
+            modelBuilder.Entity<User>()
+    .Property(u => u.Ip)
+    .IsRequired(false); // Allow NULL values
+
 
             base.OnModelCreating(modelBuilder);
         }
