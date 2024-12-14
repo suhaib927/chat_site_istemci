@@ -10,7 +10,7 @@
     <ul class="list-unstyled chat-list mt-2 mb-0">
         @foreach (var chat in Model.Chats)
         {
-            <li class="clearfix" onclick="loadChat('@chat.ChatId')">
+            <li class="clearfix" onclick="selectChat('@chat.ChatId')">
                 <img src="@chat.ImageUrl" alt="avatar">
                 <div class="about">
                     <div class="name">@chat.Name</div>
@@ -23,10 +23,3 @@
         }
     </ul>
 </div>
-<script>
-    function loadChat(chatId) {
-        $.get('/Chat/LoadChat', { id: chatId }, function (response) {
-            $('#chat-content').html(response);
-        });
-    }
-</script>
