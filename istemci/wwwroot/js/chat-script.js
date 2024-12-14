@@ -1,7 +1,5 @@
 ﻿function selectChat(element) {
     const chatId = element;
-
-    // إرسال طلب إلى السيرفر لجلب بيانات المحادثة
     fetch(`/Chat/LoadChat?chatId=${chatId}`)
         .then(response => response.text())
         .then(data => {

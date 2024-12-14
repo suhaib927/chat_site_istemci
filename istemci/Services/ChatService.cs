@@ -13,7 +13,7 @@ namespace chat_site_istemci.Services
             // بيانات وهمية لتجربة الخدمة
             return new List<Chat>
             {
-                new Chat { ChatId = 1, Name = "Vincent Porter", ImageUrl = "https://bootdey.com/img/Content/avatar/avatar1.png", StatusIcon = "fa-circle offline", StatusText = "left 7 mins ago" },
+                new Chat { ChatId = 1, Name = "3333333 Porter", ImageUrl = "https://bootdey.com/img/Content/avatar/avatar1.png", StatusIcon = "fa-circle offline", StatusText = "left 7 mins ago" },
                 new Chat { ChatId = 2, Name = "Aiden Chavez", ImageUrl = "https://bootdey.com/img/Content/avatar/avatar2.png", StatusIcon = "fa-circle online", StatusText = "online" }
             };
         }
