@@ -45,7 +45,9 @@ namespace chat_site_istemci.Controllers
                     User user = _databaseContext.Users.SingleOrDefault(x => x.Username.ToLower() == model.Username.ToLower() && x.Password == hashedPassword);
                     if (user != null)
                     {
-                        
+                        user.IsOnline = true;
+                        _databaseContext.SaveChanges();
+
                         List<Claim> claims = new List<Claim>();//Claims are stored in secure locations such as the Identity object, JWT tokens, or session/cookies. They are primarily used for authentication (verifying the user's identity) and authorization (determining what actions or resources the user is allowed to access). Claims provide a flexible and secure way to store and transfer user-specific information, which can then be utilized by the system for decision-making during user requests.
                         claims.Add(new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()));
                         claims.Add(new Claim("Username", user.Username));
@@ -214,6 +216,14 @@ namespace chat_site_istemci.Controllers
 
             public IActionResult Logout()
             {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = _databaseContext.Users.SingleOrDefault(x => x.UserId == new Guid(userId));
+                if (user != null)
+                {
+                    user.IsOnline = false;
+                    user.CreatedAt = DateTime.Now;
+                    _databaseContext.SaveChanges(); 
+                }
                 HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 return RedirectToAction(nameof(Login));
             }

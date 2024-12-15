@@ -1,7 +1,7 @@
 ﻿function selectChat(element) {
     const chatId = element;
 
-    fetch(`/Chat/LoadChat?chatId=${chatId}`)
+    fetch(`/Chat/LoadChat?chatId=${chatId.toString()}`)
         .then(response => response.text())
         .then(data => {
             document.getElementById("chat-content").innerHTML = data;

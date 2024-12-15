@@ -1,28 +1,28 @@
-﻿@model IEnumerable<User>
+﻿@model ChatViewModel
 
 
 <div class="chat">
     <div class="chat-header clearfix">
         <div class="row">
             <div class="col-lg-6">
-                <img src="@Model.ProfileImageFileName" alt="avatar">
+                <img src="@Model.user.ProfileImageFileName" alt="avatar">
                 <div class="chat-about">
-                    <h6 class="m-b-0">@Model.Username</h6>
-                    @* <small>@Model.LastSeen</small> *@
+                    <h6 class="m-b-0">@Model.user.Username</h6>
+                    <small>@Model.user.CreatedAt</small>
                 </div>
             </div>
         </div>
     </div>
     <div class="chat-history">
         <ul class="m-b-0">
-            @foreach (var message in Model)
+            @foreach (var message in Model.Messages)
             {
                 <li class="clearfix">
                     <div class="message-data @message.Alignment">
-                        <span class="message-data-time">@message.Time</span>
-                        <img src="@message.UserImageUrl" alt="avatar">
+                        <span class="message-data-time">@message.SentAt</span>
+                        <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">@* kkkkkkkkkkkkkkkkkk *@
                     </div>
-                    <div class="message @message.CssClass">@message.Text</div>
+                    <div class="message @message.CssClass">@message.MessageContent</div>
                 </li>
             }
         </ul>

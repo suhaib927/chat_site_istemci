@@ -4,6 +4,8 @@ using chat_site_istemci.Models;
 using Microsoft.AspNetCore.Authorization;
 using chat_site_istemci.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Security.Claims;
 
 
 public class ChatController : Controller
@@ -18,13 +20,30 @@ public class ChatController : Controller
     [Authorize]
     public async Task<IActionResult> Index()
     {
-        var model = await _databaseContext.Users.ToListAsync();
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var model = await _databaseContext.Users
+            .Where(user => user.UserId.ToString() != currentUserId)
+            .ToListAsync();
+
         return View(model);
     }
-    [Authorize]
-    public IActionResult LoadChat(int id)
+    public IActionResult LoadChat(string chatId)
     {
-        //var chat = _chatService.GetChatById(id);
-        return PartialView("ChatDetails" /*,chat*/);
+        if (Guid.TryParse(chatId, out Guid parsedChatId))
+        {
+            ChatViewModel model = new ChatViewModel
+            {
+                user = _databaseContext.Users.SingleOrDefault(u => u.UserId == parsedChatId),
+                Messages = _databaseContext.Messages.ToList()
+            };
+            if (model.user != null)
+            {
+                return PartialView("ChatDetails", model);
+            }
+            return NotFound();
+        }
+
+        return BadRequest("Invalid chat ID.");
     }
 }
