@@ -21,15 +21,23 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/Chat/Index">Chat</a>
-                </li>
-                <li class="nav-item ms-auto">
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                </li>
-                <li class="nav-item ms-auto">
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
-                </li>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item ms-auto">
+                        <form asp-area="" asp-controller="Account" asp-action="Logout">
+                            <button class="btn"><i class="bi bi-box-arrow-left" style="margin-right:5px"></i>Logout</button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item ms-auto">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                    </li>
+                    <li class="nav-item ms-auto">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+                    </li>
+                }
             </ul>
         </div>
     </nav>

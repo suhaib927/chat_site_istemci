@@ -1,27 +1,30 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿ using Microsoft.AspNetCore.Mvc;
 using chat_site_istemci.Services;
 using chat_site_istemci.Models;
+using Microsoft.AspNetCore.Authorization;
+using chat_site_istemci.Entities;
+using Microsoft.EntityFrameworkCore;
 
 
 public class ChatController : Controller
+
 {
-    private readonly IChatService _chatService;
+    private readonly DatabaseContext _databaseContext;
 
-    public ChatController(IChatService chatService)
+    public ChatController(DatabaseContext databaseContext)
     {
-        _chatService = chatService;
+        _databaseContext = databaseContext;
     }
-
-    public IActionResult Index()
+    [Authorize]
+    public async Task<IActionResult> Index()
     {
-        var chats = _chatService.GetAllChats();
-        var model = new ChatViewModel { Chats = chats };
+        var model = await _databaseContext.Users.ToListAsync();
         return View(model);
     }
-
+    [Authorize]
     public IActionResult LoadChat(int id)
     {
-        var chat = _chatService.GetChatById(id);
-        return PartialView("ChatDetails", chat);
+        //var chat = _chatService.GetChatById(id);
+        return PartialView("ChatDetails" /*,chat*/);
     }
 }

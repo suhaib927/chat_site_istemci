@@ -1,20 +1,21 @@
-﻿@model chat_site_istemci.Models.Chat
+﻿@model IEnumerable<User>
+
 
 <div class="chat">
     <div class="chat-header clearfix">
         <div class="row">
             <div class="col-lg-6">
-                <img src="@Model.ImageUrl" alt="avatar">
+                <img src="@Model.ProfileImageFileName" alt="avatar">
                 <div class="chat-about">
-                    <h6 class="m-b-0">@Model.Name</h6>
-                    <small>@Model.LastSeen</small>
+                    <h6 class="m-b-0">@Model.Username</h6>
+                    @* <small>@Model.LastSeen</small> *@
                 </div>
             </div>
         </div>
     </div>
     <div class="chat-history">
         <ul class="m-b-0">
-            @foreach (var message in Model.Messages)
+            @foreach (var message in Model)
             {
                 <li class="clearfix">
                     <div class="message-data @message.Alignment">

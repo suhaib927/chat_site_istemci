@@ -8,7 +8,7 @@
         <input type="text" class="form-control" placeholder="Search...">
     </div>
     <ul class="list-unstyled chat-list mt-2 mb-0">
-        @foreach (var chat in Model.Chats)
+        @* @foreach (var chat in Model.Chats)
         {
             <li class="clearfix" onclick="selectChat('@chat.ChatId')">
                 <img src="@chat.ImageUrl" alt="avatar">
@@ -20,6 +20,6 @@
                     </div>
                 </div>
             </li>
-        }
+        } *@
     </ul>
 </div>

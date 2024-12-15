@@ -7,7 +7,7 @@ using chat_site_istemci.Entities;
 namespace chat_site_istemci.Entities
 {
     [Table("Users")]
-    public class User
+    public class User 
     {
         [Key]
         public Guid UserId { get; set; }

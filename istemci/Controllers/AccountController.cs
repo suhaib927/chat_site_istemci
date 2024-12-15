@@ -13,7 +13,7 @@ namespace chat_site_istemci.Controllers
     [Authorize]
 
     public class AccountController : Controller
-        {
+    {
             private readonly DatabaseContext _databaseContext;
             private readonly IConfiguration _configuration;
 
@@ -25,7 +25,13 @@ namespace chat_site_istemci.Controllers
             [AllowAnonymous]
             public IActionResult Login()
             {
+                if (User.Identity.IsAuthenticated)
+                {
+                    return RedirectToAction("Index", "Chat");
+                }
                 return View();
+
+
             }
             [AllowAnonymous]
             [HttpPost]
@@ -48,7 +54,7 @@ namespace chat_site_istemci.Controllers
                         ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
                         HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Index", "Chat");
                     }
 
                     else
@@ -71,7 +77,11 @@ namespace chat_site_istemci.Controllers
             [AllowAnonymous]
             public IActionResult Register()
             {
-                return View();
+                if (User.Identity.IsAuthenticated)
+                {
+                    return RedirectToAction("Index", "Chat");
+                }
+            return View();
             }
             [AllowAnonymous]
             [HttpPost]
