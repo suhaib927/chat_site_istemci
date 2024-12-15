@@ -7,6 +7,7 @@ namespace chat_site_istemci.Services
 {
     public class ChatService : IChatService
     {
+        /*
         // هنا يمكن أن تضيف اتصالاً بقاعدة البيانات
         public List<Chat> GetAllChats()
         {
@@ -35,5 +36,6 @@ namespace chat_site_istemci.Services
                 }
             };
         }
+        */
     }
 }

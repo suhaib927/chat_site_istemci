@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System;
-using chat_site_istemci.Entities;
 
 namespace chat_site_istemci.Entities
 {

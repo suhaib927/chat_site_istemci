@@ -7,7 +7,7 @@ namespace chat_site_istemci.Services
 {
     public interface IChatService
     {
-        List<Chat> GetAllChats(); // إرجاع قائمة المحادثات
-        Chat GetChatById(int id); // إرجاع محادثة واحدة
+        //List<Chat> GetAllChats(); // إرجاع قائمة المحادثات
+        //Chat GetChatById(int id); // إرجاع محادثة واحدة
     }
 }

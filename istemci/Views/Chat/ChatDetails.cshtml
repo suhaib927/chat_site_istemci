@@ -1,13 +1,14 @@
-﻿@model chat_site_istemci.Models.Chat
+﻿@model ChatViewModel
+
 
 <div class="chat">
     <div class="chat-header clearfix">
         <div class="row">
             <div class="col-lg-6">
-                <img src="@Model.ImageUrl" alt="avatar">
+                <img src="@Model.user.ProfileImageFileName" alt="avatar">
                 <div class="chat-about">
-                    <h6 class="m-b-0">@Model.Name</h6>
-                    <small>@Model.LastSeen</small>
+                    <h6 class="m-b-0">@Model.user.Username</h6>
+                    <small>@Model.user.CreatedAt</small>
                 </div>
             </div>
         </div>
@@ -18,10 +19,10 @@
             {
                 <li class="clearfix">
                     <div class="message-data @message.Alignment">
-                        <span class="message-data-time">@message.Time</span>
-                        <img src="@message.UserImageUrl" alt="avatar">
+                        <span class="message-data-time">@message.SentAt</span>
+                        <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">@* kkkkkkkkkkkkkkkkkk *@
                     </div>
-                    <div class="message @message.CssClass">@message.Text</div>
+                    <div class="message @message.CssClass">@message.MessageContent</div>
                 </li>
             }
         </ul>

@@ -1,4 +1,4 @@
-﻿@model chat_site_istemci.Models.ChatViewModel
+﻿@model IEnumerable<chat_site_istemci.Entities.User>
 
 <div id="plist" class="people-list">
     <div class="input-group">
@@ -8,16 +8,25 @@
         <input type="text" class="form-control" placeholder="Search...">
     </div>
     <ul class="list-unstyled chat-list mt-2 mb-0">
-        @foreach (var chat in Model.Chats)
+         @foreach (var chat in Model)
         {
-            <li class="clearfix" onclick="selectChat('@chat.ChatId')">
-                <img src="@chat.ImageUrl" alt="avatar">
+            <li class="clearfix" onclick="selectChat('@chat.UserId')">
+                <img src="@chat.ProfileImageFileName" alt="avatar">
                 <div class="about">
-                    <div class="name">@chat.Name</div>
+                    <div class="name">@chat.Username</div>
                     <div class="status">
-                        <i class="fa @chat.StatusIcon"></i>
-                        @chat.StatusText
-                    </div>
+
+                        @if (chat.IsOnline)
+                        {
+                            <i class="fa fa-circle online"></i>
+                            <span>Online</span>
+                        }
+                        else
+                        {
+                            <i class="fa fa-circle offline"></i>
+                            <span>@chat.CreatedAt</span>
+                        }
+                    </div> 
                 </div>
             </li>
         }
