@@ -12,10 +12,12 @@ public class ChatController : Controller
 
 {
     private readonly DatabaseContext _databaseContext;
+    private readonly SocketService _socketService;
 
-    public ChatController(DatabaseContext databaseContext)
+    public ChatController(DatabaseContext databaseContext, SocketService socketService)
     {
         _databaseContext = databaseContext;
+        _socketService = socketService;
     }
     [Authorize]
     public async Task<IActionResult> Index()
@@ -28,15 +30,16 @@ public class ChatController : Controller
 
         return View(model);
     }
-    public IActionResult LoadChat(string chatId)
+    public async Task<IActionResult> LoadChatAsync(string chatId)
     {
         if (Guid.TryParse(chatId, out Guid parsedChatId))
         {
             ChatViewModel model = new ChatViewModel
             {
-                user = _databaseContext.Users.SingleOrDefault(u => u.UserId == parsedChatId),
-                Messages = _databaseContext.Messages.ToList()
+                user = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == parsedChatId),
             };
+            model.Messages = await _databaseContext.Messages.Where(m => m.SenderId == model.user.UserId && m.Status == true)
+            .ToListAsync();
             if (model.user != null)
             {
                 return PartialView("ChatDetails", model);
@@ -45,5 +48,24 @@ public class ChatController : Controller
         }
 
         return BadRequest("Invalid chat ID.");
+    }
+
+    // إرسال الرسالة للـ Server
+    [HttpPost]
+    public async Task<IActionResult> SendMessage(Message model)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var message = new Message
+        {
+            SenderId = userId,
+            ReceiverId = model.ReceiverId,
+            MessageContent = model.MessageContent,
+            Type = model.Type,
+            SentAt = DateTime.Now
+        };
+        // إرسال الرسالة إلى الخادم
+        _socketService.SendMessageToServer(message);
+        return RedirectToAction("LoadChat", new { chatId = model.ReceiverId.ToString() });
+
     }
 }

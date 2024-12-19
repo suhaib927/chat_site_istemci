@@ -18,21 +18,28 @@
             @foreach (var message in Model.Messages)
             {
                 <li class="clearfix">
-                    <div class="message-data @message.Alignment">
+                    <div class="message-data @message.Type">
                         <span class="message-data-time">@message.SentAt</span>
                         <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">@* kkkkkkkkkkkkkkkkkk *@
                     </div>
-                    <div class="message @message.CssClass">@message.MessageContent</div>
+                    <div class="message @message.Type">@message.MessageContent</div>
                 </li>
             }
         </ul>
     </div>
     <div class="chat-message clearfix">
-        <div class="input-group mb-0">
-            <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fa fa-send"></i></span>
+        <form method="post" asp-action="SendMessage" asp-controller="Chat">
+            <div class="input-group mb-0">
+            
+                <div class="input-group-prepend">
+                    <button type="submit"><span class="input-group-text"><i class="fa fa-send"> </i></span></button>
+                    
+                </div>
+                <input type="text" class="form-control" id="message" name="MessageContent" placeholder="Enter text here..." required />
+            
+                <input type="hidden" name="ReceiverId" value="@Model.user.UserId" />
+                <input type="hidden" name="Type" value="Individual" /> @*value aaaaaaaaaaaaaaaaaaaa *@
             </div>
-            <input type="text" class="form-control" placeholder="Enter text here...">
-        </div>
+        </form>
     </div>
 </div>

@@ -33,10 +33,13 @@ namespace chat_site_istemci.Entities
                 .HasForeignKey(m => m.SenderId)
                 .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete
 
+            // Add configuration for Receiver
             modelBuilder.Entity<Message>()
-                .HasOne(m => m.Group)
-                .WithMany(g => g.Messages)
-                .HasForeignKey(m => m.GroupId);
+                .HasOne(m => m.Receiver)
+                .WithMany(u => u.ReceivedMessages) // Assuming you have `ReceivedMessages` in the User model
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Cascade); // Prevent cascading delete
+
 
             // Configuring relationships for FailedMessage
             modelBuilder.Entity<FailedMessage>()

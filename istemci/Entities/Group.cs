@@ -15,7 +15,6 @@ namespace chat_site_istemci.Entities
         public int MaxMembers { get; set; }
 
         public ICollection<GroupMember> Members { get; set; } // Members of the group
-        public ICollection<Message> Messages { get; set; } // Messages sent to the group
 
     }
 }
