@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace chat_site_istemci.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class deleteFaukedNessages : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,7 +31,7 @@ namespace chat_site_istemci.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Ip = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true, defaultValue:"000.000.000.000"),
+                    Ip = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Username = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     IsOnline = table.Column<bool>(type: "bit", nullable: false),
@@ -74,21 +74,20 @@ namespace chat_site_istemci.Migrations
                 {
                     MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SenderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ReceiverId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     MessageContent = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SentAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CssClass = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Alignment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Messages", x => x.MessageId);
                     table.ForeignKey(
-                        name: "FK_Messages_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "GroupId",
+                        name: "FK_Messages_Users_ReceiverId",
+                        column: x => x.ReceiverId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Messages_Users_SenderId",
@@ -97,32 +96,6 @@ namespace chat_site_istemci.Migrations
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
                 });
-
-            migrationBuilder.CreateTable(
-                name: "FailedMessages",
-                columns: table => new
-                {
-                    FailedMessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FailureReason = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FailedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FailedMessages", x => x.FailedMessageId);
-                    table.ForeignKey(
-                        name: "FK_FailedMessages_Messages_MessageId",
-                        column: x => x.MessageId,
-                        principalTable: "Messages",
-                        principalColumn: "MessageId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FailedMessages_MessageId",
-                table: "FailedMessages",
-                column: "MessageId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_GroupMembers_GroupId",
@@ -135,9 +108,9 @@ namespace chat_site_istemci.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_GroupId",
+                name: "IX_Messages_ReceiverId",
                 table: "Messages",
-                column: "GroupId");
+                column: "ReceiverId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_SenderId",
@@ -148,9 +121,6 @@ namespace chat_site_istemci.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "FailedMessages");
-
             migrationBuilder.DropTable(
                 name: "GroupMembers");
 

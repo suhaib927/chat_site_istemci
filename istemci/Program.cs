@@ -1,21 +1,23 @@
 using chat_site_istemci.Entities;
 using chat_site_istemci.Services;
-using chat_site_istemci.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.FileProviders;
 using System.Reflection;
 using Microsoft.AspNetCore.Identity;
+using chat_site_istemci.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
-builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddSingleton<SocketService>();
 
 builder.Services.AddDbContext<DatabaseContext>(opts => {
     opts.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddSingleton<Chats>();
 
 
 builder.Services
@@ -31,6 +33,8 @@ builder.Services
       });
 
 var app = builder.Build();
+
+var socketService = app.Services.GetRequiredService<SocketService>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

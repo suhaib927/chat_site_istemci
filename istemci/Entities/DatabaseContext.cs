@@ -11,7 +11,6 @@ namespace chat_site_istemci.Entities
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMember> GroupMembers { get; set; }
         public DbSet<Message> Messages { get; set; }
-        public DbSet<FailedMessage> FailedMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,16 +32,12 @@ namespace chat_site_istemci.Entities
                 .HasForeignKey(m => m.SenderId)
                 .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete
 
+            // Add configuration for Receiver
             modelBuilder.Entity<Message>()
-                .HasOne(m => m.Group)
-                .WithMany(g => g.Messages)
-                .HasForeignKey(m => m.GroupId);
-
-            // Configuring relationships for FailedMessage
-            modelBuilder.Entity<FailedMessage>()
-                .HasOne(fm => fm.Message)
-                .WithOne(m => m.FailedMessage)
-                .HasForeignKey<FailedMessage>(fm => fm.MessageId);
+                .HasOne(m => m.Receiver)
+                .WithMany(u => u.ReceivedMessages) // Assuming you have `ReceivedMessages` in the User model
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Cascade); // Prevent cascading delete
 
             modelBuilder.Entity<User>()
     .Property(u => u.Ip)

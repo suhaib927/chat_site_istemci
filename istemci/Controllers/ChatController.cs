@@ -12,31 +12,56 @@ public class ChatController : Controller
 
 {
     private readonly DatabaseContext _databaseContext;
+    private readonly SocketService _socketService;
+    private Chats _chats;
 
-    public ChatController(DatabaseContext databaseContext)
+    public ChatController(DatabaseContext databaseContext, SocketService socketService, Chats chats)
     {
         _databaseContext = databaseContext;
+        _socketService = socketService;
+        _chats  = chats;
     }
     [Authorize]
     public async Task<IActionResult> Index()
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        var model = await _databaseContext.Users
-            .Where(user => user.UserId.ToString() != currentUserId)
-            .ToListAsync();
+        ChatsListViewModel model = new ChatsListViewModel
+        {
+            users = await _databaseContext.Users
+            //.Where(user => user.UserId.ToString() != currentUserId)
+            .ToListAsync(),
+            groups = await _databaseContext.Groups.ToListAsync()
+
+        };
+
 
         return View(model);
     }
-    public IActionResult LoadChat(string chatId)
+    public async Task<IActionResult> LoadChatAsync(string chatId)
     {
         if (Guid.TryParse(chatId, out Guid parsedChatId))
         {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             ChatViewModel model = new ChatViewModel
             {
-                user = _databaseContext.Users.SingleOrDefault(u => u.UserId == parsedChatId),
-                Messages = _databaseContext.Messages.ToList()
+                user = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == parsedChatId),
             };
+
+            var existingChat = _chats.chats.FirstOrDefault(c => c.ChatKey == chatId);
+            if (existingChat != null)
+            {
+                model.Messages = existingChat.Messages;
+            }
+            else
+            {
+                var newChat = new Chat
+                {
+                    ChatKey = chatId,
+                };
+                _chats.chats.Add(newChat);
+            }
             if (model.user != null)
             {
                 return PartialView("ChatDetails", model);
@@ -45,5 +70,37 @@ public class ChatController : Controller
         }
 
         return BadRequest("Invalid chat ID.");
+    }
+
+    // إرسال الرسالة للـ Server
+    [HttpPost]
+    public async Task<IActionResult> SendMessage(string MessageContent, string ReceiverId, string Type)
+    {
+
+
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var message = new Message
+        {
+            MessageId = Guid.NewGuid(),
+            SenderId = userId,
+            Sender = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == userId),
+            ReceiverId = Guid.Parse(ReceiverId),
+            Receiver = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == Guid.Parse(ReceiverId)),
+            MessageContent = MessageContent,
+            Type = Type,
+            SentAt = DateTime.Now,
+            Status = false
+        };
+
+        var existingChat = _chats.chats.FirstOrDefault(c => c.ChatKey == ReceiverId);
+        if (existingChat != null)
+        {
+            existingChat.Messages.Add(message);
+        }
+
+        
+        // إرسال الرسالة إلى الخادم
+        _socketService.SendMessageToServer(message);
+        return Json(new { MessageContent = MessageContent, SentAt = DateTime.Now.ToString(), Type = Type });
     }
 }

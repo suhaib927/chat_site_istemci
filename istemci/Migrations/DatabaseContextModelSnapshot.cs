@@ -22,30 +22,6 @@ namespace chat_site_istemci.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("chat_site_istemci.Entities.FailedMessage", b =>
-                {
-                    b.Property<Guid>("FailedMessageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("FailedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FailureReason")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("MessageId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("FailedMessageId");
-
-                    b.HasIndex("MessageId")
-                        .IsUnique();
-
-                    b.ToTable("FailedMessages");
-                });
-
             modelBuilder.Entity("chat_site_istemci.Entities.Group", b =>
                 {
                     b.Property<Guid>("GroupId")
@@ -99,20 +75,12 @@ namespace chat_site_istemci.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Alignment")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CssClass")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("GroupId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("MessageContent")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ReceiverId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SenderId")
                         .HasColumnType("uniqueidentifier");
@@ -123,9 +91,13 @@ namespace chat_site_istemci.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("MessageId");
 
-                    b.HasIndex("GroupId");
+                    b.HasIndex("ReceiverId");
 
                     b.HasIndex("SenderId");
 
@@ -142,8 +114,7 @@ namespace chat_site_istemci.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Ip")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsOnline")
                         .HasColumnType("bit");
@@ -167,17 +138,6 @@ namespace chat_site_istemci.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("chat_site_istemci.Entities.FailedMessage", b =>
-                {
-                    b.HasOne("chat_site_istemci.Entities.Message", "Message")
-                        .WithOne("FailedMessage")
-                        .HasForeignKey("chat_site_istemci.Entities.FailedMessage", "MessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Message");
-                });
-
             modelBuilder.Entity("chat_site_istemci.Entities.GroupMember", b =>
                 {
                     b.HasOne("chat_site_istemci.Entities.Group", "Group")
@@ -199,9 +159,9 @@ namespace chat_site_istemci.Migrations
 
             modelBuilder.Entity("chat_site_istemci.Entities.Message", b =>
                 {
-                    b.HasOne("chat_site_istemci.Entities.Group", "Group")
-                        .WithMany("Messages")
-                        .HasForeignKey("GroupId")
+                    b.HasOne("chat_site_istemci.Entities.User", "Receiver")
+                        .WithMany("ReceivedMessages")
+                        .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -211,7 +171,7 @@ namespace chat_site_istemci.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Group");
+                    b.Navigation("Receiver");
 
                     b.Navigation("Sender");
                 });
@@ -219,19 +179,13 @@ namespace chat_site_istemci.Migrations
             modelBuilder.Entity("chat_site_istemci.Entities.Group", b =>
                 {
                     b.Navigation("Members");
-
-                    b.Navigation("Messages");
-                });
-
-            modelBuilder.Entity("chat_site_istemci.Entities.Message", b =>
-                {
-                    b.Navigation("FailedMessage")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("chat_site_istemci.Entities.User", b =>
                 {
                     b.Navigation("GroupMemberships");
+
+                    b.Navigation("ReceivedMessages");
 
                     b.Navigation("SentMessages");
                 });

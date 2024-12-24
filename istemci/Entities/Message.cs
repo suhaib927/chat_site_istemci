@@ -16,17 +16,16 @@ namespace chat_site_istemci.Entities
         public User Sender { get; set; } // User who sent the message
 
         [Required]
-        [ForeignKey(nameof(Group))]
-        public Guid GroupId { get; set; }
-        public Group Group { get; set; } // Group the message belongs to
+        [ForeignKey(nameof(Receiver))]
+        public Guid ReceiverId { get; set; }
+        public User Receiver { get; set; } // User who received the message
 
         public string MessageContent { get; set; }
         public DateTime SentAt { get; set; } = DateTime.Now;
 
-        public string CssClass { get; set; }
-        public string Alignment { get; set; }
+        public string Type { get; set; }
+
         public bool Status { get; set; } = false; // Delivered or not
-        public FailedMessage FailedMessage { get; set; } // Optional reference to a failed message
 
     }
 }

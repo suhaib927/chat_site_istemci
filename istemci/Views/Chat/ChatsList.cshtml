@@ -1,4 +1,4 @@
-﻿@model IEnumerable<chat_site_istemci.Entities.User>
+﻿@model ChatsListViewModel
 
 <div id="plist" class="people-list">
     <div class="input-group">
@@ -7,28 +7,91 @@
         </div>
         <input type="text" class="form-control" placeholder="Search...">
     </div>
-    <ul class="list-unstyled chat-list mt-2 mb-0">
-         @foreach (var chat in Model)
-        {
-            <li class="clearfix" onclick="selectChat('@chat.UserId')">
-                <img src="@chat.ProfileImageFileName" alt="avatar">
-                <div class="about">
-                    <div class="name">@chat.Username</div>
-                    <div class="status">
+    <div class="chat-sidebar">
+        <!-- أزرار التبديل بين الأقسام -->
+        <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+            <label class="btn btn-secondary active flex-fill">
+                <input type="radio" name="options" id="option1" autocomplete="off" checked onclick="showSection('privates')"> Privates
+            </label>
+            <label class="btn btn-secondary flex-fill">
+                <input type="radio" name="options" id="option2" autocomplete="off" onclick="showSection('groups')"> Groups
+            </label>
+            <label class="btn btn-secondary flex-fill">
+                <input type="radio" name="options" id="option3" autocomplete="off" onclick="showSection('broadcast')"> Broadcast
+            </label>
+        </div>
 
-                        @if (chat.IsOnline)
-                        {
-                            <i class="fa fa-circle online"></i>
-                            <span>Online</span>
-                        }
-                        else
-                        {
-                            <i class="fa fa-circle offline"></i>
-                            <span>@chat.CreatedAt</span>
-                        }
-                    </div> 
-                </div>
-            </li>
-        }
-    </ul>
+        <!-- الأقسام -->
+        <div id="privates" class="chat-list-section">
+            <ul class="list-unstyled chat-list mt-2 mb-0">
+                @foreach (var chat in Model.users)
+                {
+                    <li class="clearfix" onclick="selectChat('@chat.UserId')">
+                        <img src="@chat.ProfileImageFileName" alt="avatar">
+                        <div class="about">
+                            <div class="name">@chat.Username</div>
+                            <div class="status">
+                                @if (chat.IsOnline)
+                                {
+                                    <i class="fa fa-circle online"></i>
+                                    <span>Online</span>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-circle offline"></i>
+                                    <span>@chat.CreatedAt</span>
+                                }
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <div id="groups" class="chat-list-section" style="display: none;">
+            <ul class="list-unstyled chat-list mt-2 mb-0">
+                @foreach (var chat in Model.groups)
+                {
+                    <li class="clearfix" onclick="selectChat('@chat.GroupId')">
+                        <img src="@chat.GroupImageUrl" alt="avatar">
+                        <div class="about">
+                            <div class="name">@chat.GroupName</div>
+                            <div class="status">
+                                <span>Group Chat</span>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <div id="broadcast" class="chat-list-section" style="display: none;">
+            <ul class="list-unstyled chat-list mt-2 mb-0">
+                @* @foreach (var chat in Model.Where(c => c.Type == "broadcast"))
+                {
+                    <li class="clearfix" onclick="selectChat('@chat.UserId')">
+                        <img src="@chat.ProfileImageFileName" alt="avatar">
+                        <div class="about">
+                            <div class="name">@chat.Username</div>
+                            <div class="status">
+                                <span>Broadcast Message</span>
+                            </div>
+                        </div>
+                    </li>
+                } *@
+            </ul>
+        </div>
+    </div>
 </div>
+
+<script>
+    function showSection(sectionId) {
+        // إخفاء جميع الأقسام
+        document.querySelectorAll('.chat-list-section').forEach(section => {
+            section.style.display = 'none';
+        });
+
+        // عرض القسم المطلوب
+        document.getElementById(sectionId).style.display = 'block';
+    }
+</script>

@@ -1,6 +1,5 @@
 ﻿@model ChatViewModel
 
-
 <div class="chat">
     <div class="chat-header clearfix">
         <div class="row">
@@ -18,21 +17,63 @@
             @foreach (var message in Model.Messages)
             {
                 <li class="clearfix">
-                    <div class="message-data @message.Alignment">
+                    <div class="message-data @message.Type">
                         <span class="message-data-time">@message.SentAt</span>
-                        <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">@* kkkkkkkkkkkkkkkkkk *@
+                        <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
                     </div>
-                    <div class="message @message.CssClass">@message.MessageContent</div>
+                    <div class="message @message.Type">@message.MessageContent</div>
                 </li>
             }
         </ul>
     </div>
     <div class="chat-message clearfix">
-        <div class="input-group mb-0">
-            <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fa fa-send"></i></span>
+        <form id="chatForm">
+            <div class="input-group mb-0">
+                <div class="input-group-prepend">
+                    <button type="submit"><span class="input-group-text"><i class="fa fa-send"> </i></span></button>
+                </div>
+                <input type="text" class="form-control" id="message" name="MessageContent" placeholder="Enter text here..." required />
+                <input type="hidden" name="ReceiverId" value="@Model.user.UserId" />
+                <input type="hidden" name="Type" value="Private" />
             </div>
-            <input type="text" class="form-control" placeholder="Enter text here...">
-        </div>
+        </form>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#chatForm').submit(function(event){
+            event.preventDefault();  // لمنع التحديث التلقائي للصفحة
+
+            var messageContent = $('#message').val();
+            var receiverId = $('input[name="ReceiverId"]').val();
+            var messageType = $('input[name="Type"]').val();
+
+            // إرسال البيانات باستخدام AJAX
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("SendMessage", "Chat")',  // ستتم معالجة البيانات في هذا الرابط
+                data: {
+                    MessageContent: messageContent,
+                    ReceiverId: receiverId.toString(),
+                    Type: messageType
+                },
+                success: function(response){
+                    // عند النجاح، يمكنك إضافة الرسالة الجديدة إلى الواجهة أو تحديثها
+                    // هنا يمكن إضافة الكود لعرض الرسالة المرسلة في المحادثة مباشرة
+                    var newMessage = '<li class="clearfix"><div class="message-data ' + response.Type + '">' +
+                        '<span class="message-data-time">' + response.SentAt + '</span>' +
+                        '<img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar"></div>' +
+                        '<div class="message ' + response.Type + '">' + response.MessageContent + '</div></li>';
+
+                    $('.chat-history ul').append(newMessage); // إضافة الرسالة الجديدة
+                    $('#message').val(''); // مسح محتوى حقل الإدخال
+                },
+                error: function(){
+                    alert('حدث خطأ أثناء إرسال الرسالة');
+                }
+            });
+        });
+    });
+</script>
