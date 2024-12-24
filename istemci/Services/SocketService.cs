@@ -1,4 +1,5 @@
 ﻿using chat_site_istemci.Entities;
+using chat_site_istemci.Models;
 using Newtonsoft.Json;
 using System;
 using System.Net.Sockets;
@@ -12,7 +13,11 @@ namespace chat_site_istemci.Services
         private static Socket _socket;
         private static Thread _listenerThread;
         private static bool _isConnected = false;
-
+        private Chats _chats;
+        public SocketService(Chats chats)
+        {
+            _chats = chats;
+        }
         // اتصال بالخادم
         public void ConnectToServer(string userId)
         {
@@ -91,8 +96,23 @@ namespace chat_site_istemci.Services
                     if (bytesRead > 0)
                     {
                         string receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                        Console.WriteLine($"Received from server: {receivedMessage}");
-                        // هنا يمكنك معالجة الرسائل الواردة مثل عرضها في واجهة المستخدم
+                        Message message = JsonConvert.DeserializeObject<Message>(receivedMessage);
+
+                        var existingChat = _chats.chats.FirstOrDefault(c => c.ChatKey == message.SenderId.ToString());
+                        if (existingChat != null)
+                        {
+                            existingChat.Messages.Add(message);
+                        }
+                        else
+                        {
+                            var newChat = new Chat
+                            {
+                                ChatKey = message.SenderId.ToString(),
+                            };
+                            _chats.chats.Add(newChat);
+                        }
+
+
                     }
                 }
             }

@@ -26,7 +26,6 @@ namespace chat_site_istemci.Entities
         public string Type { get; set; }
 
         public bool Status { get; set; } = false; // Delivered or not
-        public FailedMessage FailedMessage { get; set; } // Optional reference to a failed message
 
     }
 }

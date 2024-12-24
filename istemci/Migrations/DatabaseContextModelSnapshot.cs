@@ -22,30 +22,6 @@ namespace chat_site_istemci.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("chat_site_istemci.Entities.FailedMessage", b =>
-                {
-                    b.Property<Guid>("FailedMessageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("FailedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FailureReason")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("MessageId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("FailedMessageId");
-
-                    b.HasIndex("MessageId")
-                        .IsUnique();
-
-                    b.ToTable("FailedMessages");
-                });
-
             modelBuilder.Entity("chat_site_istemci.Entities.Group", b =>
                 {
                     b.Property<Guid>("GroupId")
@@ -162,17 +138,6 @@ namespace chat_site_istemci.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("chat_site_istemci.Entities.FailedMessage", b =>
-                {
-                    b.HasOne("chat_site_istemci.Entities.Message", "Message")
-                        .WithOne("FailedMessage")
-                        .HasForeignKey("chat_site_istemci.Entities.FailedMessage", "MessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Message");
-                });
-
             modelBuilder.Entity("chat_site_istemci.Entities.GroupMember", b =>
                 {
                     b.HasOne("chat_site_istemci.Entities.Group", "Group")
@@ -214,12 +179,6 @@ namespace chat_site_istemci.Migrations
             modelBuilder.Entity("chat_site_istemci.Entities.Group", b =>
                 {
                     b.Navigation("Members");
-                });
-
-            modelBuilder.Entity("chat_site_istemci.Entities.Message", b =>
-                {
-                    b.Navigation("FailedMessage")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("chat_site_istemci.Entities.User", b =>

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace chat_site_istemci.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class deleteFaukedNessages : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -97,32 +97,6 @@ namespace chat_site_istemci.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "FailedMessages",
-                columns: table => new
-                {
-                    FailedMessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FailureReason = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FailedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FailedMessages", x => x.FailedMessageId);
-                    table.ForeignKey(
-                        name: "FK_FailedMessages_Messages_MessageId",
-                        column: x => x.MessageId,
-                        principalTable: "Messages",
-                        principalColumn: "MessageId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FailedMessages_MessageId",
-                table: "FailedMessages",
-                column: "MessageId",
-                unique: true);
-
             migrationBuilder.CreateIndex(
                 name: "IX_GroupMembers_GroupId",
                 table: "GroupMembers",
@@ -147,9 +121,6 @@ namespace chat_site_istemci.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "FailedMessages");
-
             migrationBuilder.DropTable(
                 name: "GroupMembers");
 

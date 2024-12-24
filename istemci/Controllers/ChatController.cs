@@ -13,20 +13,28 @@ public class ChatController : Controller
 {
     private readonly DatabaseContext _databaseContext;
     private readonly SocketService _socketService;
+    private Chats _chats;
 
-    public ChatController(DatabaseContext databaseContext, SocketService socketService)
+    public ChatController(DatabaseContext databaseContext, SocketService socketService, Chats chats)
     {
         _databaseContext = databaseContext;
         _socketService = socketService;
+        _chats  = chats;
     }
     [Authorize]
     public async Task<IActionResult> Index()
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        var model = await _databaseContext.Users
-            .Where(user => user.UserId.ToString() != currentUserId)
-            .ToListAsync();
+        ChatsListViewModel model = new ChatsListViewModel
+        {
+            users = await _databaseContext.Users
+            //.Where(user => user.UserId.ToString() != currentUserId)
+            .ToListAsync(),
+            groups = await _databaseContext.Groups.ToListAsync()
+
+        };
+
 
         return View(model);
     }
@@ -34,12 +42,26 @@ public class ChatController : Controller
     {
         if (Guid.TryParse(chatId, out Guid parsedChatId))
         {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             ChatViewModel model = new ChatViewModel
             {
                 user = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == parsedChatId),
             };
-            model.Messages = await _databaseContext.Messages.Where(m => m.SenderId == model.user.UserId && m.Status == true)
-            .ToListAsync();
+
+            var existingChat = _chats.chats.FirstOrDefault(c => c.ChatKey == chatId);
+            if (existingChat != null)
+            {
+                model.Messages = existingChat.Messages;
+            }
+            else
+            {
+                var newChat = new Chat
+                {
+                    ChatKey = chatId,
+                };
+                _chats.chats.Add(newChat);
+            }
             if (model.user != null)
             {
                 return PartialView("ChatDetails", model);
@@ -52,20 +74,33 @@ public class ChatController : Controller
 
     // إرسال الرسالة للـ Server
     [HttpPost]
-    public async Task<IActionResult> SendMessage(Message model)
+    public async Task<IActionResult> SendMessage(string MessageContent, string ReceiverId, string Type)
     {
+
+
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
         var message = new Message
         {
+            MessageId = Guid.NewGuid(),
             SenderId = userId,
-            ReceiverId = model.ReceiverId,
-            MessageContent = model.MessageContent,
-            Type = model.Type,
-            SentAt = DateTime.Now
+            Sender = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == userId),
+            ReceiverId = Guid.Parse(ReceiverId),
+            Receiver = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == Guid.Parse(ReceiverId)),
+            MessageContent = MessageContent,
+            Type = Type,
+            SentAt = DateTime.Now,
+            Status = false
         };
+
+        var existingChat = _chats.chats.FirstOrDefault(c => c.ChatKey == ReceiverId);
+        if (existingChat != null)
+        {
+            existingChat.Messages.Add(message);
+        }
+
+        
         // إرسال الرسالة إلى الخادم
         _socketService.SendMessageToServer(message);
-        return RedirectToAction("LoadChat", new { chatId = model.ReceiverId.ToString() });
-
+        return Json(new { MessageContent = MessageContent, SentAt = DateTime.Now.ToString(), Type = Type });
     }
 }
