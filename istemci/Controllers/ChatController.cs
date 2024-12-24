@@ -74,7 +74,7 @@ public class ChatController : Controller
 
     // إرسال الرسالة للـ Server
     [HttpPost]
-    public async Task<IActionResult> SendMessage(string MessageContent, string ReceiverId, string Type)
+    public async Task<IActionResult> SendMessage(string MessageContent, Guid ReceiverId, string Type)
     {
 
 
@@ -84,15 +84,15 @@ public class ChatController : Controller
             MessageId = Guid.NewGuid(),
             SenderId = userId,
             Sender = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == userId),
-            ReceiverId = Guid.Parse(ReceiverId),
-            Receiver = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == Guid.Parse(ReceiverId)),
+            ReceiverId = ReceiverId,
+            Receiver = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == ReceiverId),
             MessageContent = MessageContent,
             Type = Type,
             SentAt = DateTime.Now,
             Status = false
         };
 
-        var existingChat = _chats.chats.FirstOrDefault(c => c.ChatKey == ReceiverId);
+        var existingChat = _chats.chats.FirstOrDefault(c => c.ChatKey == ReceiverId.ToString());
         if (existingChat != null)
         {
             existingChat.Messages.Add(message);
@@ -101,6 +101,7 @@ public class ChatController : Controller
         
         // إرسال الرسالة إلى الخادم
         _socketService.SendMessageToServer(message);
-        return Json(new { MessageContent = MessageContent, SentAt = DateTime.Now.ToString(), Type = Type });
+        var user = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == ReceiverId);
+        return Json(new { message = message, user = user, sentAt = message.SentAt.ToString() });
     }
 }
