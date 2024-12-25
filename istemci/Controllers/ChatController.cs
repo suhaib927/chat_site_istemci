@@ -29,7 +29,7 @@ public class ChatController : Controller
         ChatsListViewModel model = new ChatsListViewModel
         {
             users = await _databaseContext.Users
-            //.Where(user => user.UserId.ToString() != currentUserId)
+            .Where(user => user.UserId.ToString() != currentUserId)
             .ToListAsync(),
             groups = await _databaseContext.Groups.ToListAsync()
 

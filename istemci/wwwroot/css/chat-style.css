@@ -76,7 +76,10 @@
 
 .chat .chat-header {
     padding: 15px 20px;
-    border-bottom: 2px solid #f4f7f6
+    border-bottom: 2px solid #f4f7f6;
+    background-color: #b1b1b1ba;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
     .chat .chat-header img {
@@ -92,7 +95,11 @@
 
 .chat .chat-history {
     padding: 20px;
-    border-bottom: 2px solid #fff
+    height: 500px; /* الارتفاع الثابت */
+    overflow-y: auto; /* السماح بالتمرير العمودي */
+    border: 1px solid #ddd; /* إضافة حدود للتوضيح */
+    background-color: #fff; /* لون الخلفية */
+    border-radius: 5px; /* زوايا منحنية */
 }
 
     .chat .chat-history ul {
@@ -175,7 +182,44 @@
         }
 
 .chat .chat-message {
-    padding: 20px
+    padding: 15px 20px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    background-color: #fff; /* خلفية مناسبة */
+    border-radius: 0 0 8px 8px; /* انحناء للزوايا السفلية */
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); /* ظل خفيف */
+}
+
+.chat .chat-message input {
+    flex-grow: 1;
+    border: 1px solid #ddd;
+    border-radius: 20px; /* انحناء للزوايا */
+    padding: 10px 15px;
+    font-size: 14px;
+    margin-right: 10px; /* مسافة بين الحقل والزر */
+    outline: none; /* إزالة التوهج الافتراضي */
+    transition: border-color 0.3s ease; /* تأثير عند التركيز */
+}
+
+.chat .chat-message input:focus {
+    border-color: #007bff; /* تغيير لون الإطار عند التركيز */
+}
+
+.chat .chat-message button {
+    background-color: #545b62;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px; /* انحناء للزوايا */
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chat .chat-message button:hover {
+    background-color: #0056b3; /* لون أغمق عند التمرير */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* ظل خفيف عند التمرير */
 }
 
 .online,
@@ -226,7 +270,9 @@
         }
 
     .chat-app .chat {
-        margin: 0
+        margin-left: 280px; /* ترك مساحة للقائمة الجانبية */
+        border-left: 1px solid #eaeaea;
+        padding: 10px; /* تحسين العرض الداخلي */
     }
 
         .chat-app .chat .chat-header {
@@ -283,3 +329,4 @@
         .filter-buttons button:hover {
             background-color: #0056b3;
         }
+
