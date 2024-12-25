@@ -1,5 +1,7 @@
 ﻿using chat_site_istemci.Entities;
 using chat_site_istemci.Models;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Net.Sockets;
@@ -14,9 +16,11 @@ namespace chat_site_istemci.Services
         private static Thread _listenerThread;
         private static bool _isConnected = false;
         private Chats _chats;
-        public SocketService(Chats chats)
+        private IHubContext<ChatHub> _hubContext;
+        public SocketService(Chats chats, IHubContext<ChatHub> hubContext)
         {
             _chats = chats;
+            _hubContext = hubContext;
         }
         // اتصال بالخادم
         public void ConnectToServer(string userId)
@@ -98,6 +102,7 @@ namespace chat_site_istemci.Services
                         string receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                         Message message = JsonConvert.DeserializeObject<Message>(receivedMessage);
 
+                        _hubContext.Clients.All.SendAsync("ReceiveMessage", message.Sender, message,message.SentAt.ToString());
                         var existingChat = _chats.chats.FirstOrDefault(c => c.ChatKey == message.SenderId.ToString());
                         if (existingChat != null)
                         {

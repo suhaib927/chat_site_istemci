@@ -33,12 +33,10 @@
             }
         </ul>
     </div>
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
+    <div class="chat-message mb-3">
             <!-- تعديل الزر لاستخدام onclick -->
-            <button class="btn btn-outline-secondary" type="button" id="btnSendMessage" onclick="sendMessage()">Send</button>
-        </div>
-        <input type="text" class="form-control" id="message" name="MessageContent" placeholder="Enter text here..." aria-label="" aria-describedby="basic-addon1">
+        <button type="button" id="btnSendMessage" onclick="sendMessage()"> <i class="fas fa-paper-plane"></i></button>
+        <input type="text" id="message" name="MessageContent" placeholder="Enter text here..." aria-label="" aria-describedby="basic-addon1" autocomplete="off">
         <input type="hidden" id="ReceiverId" value="@Model.user.UserId.ToString()" />
         <input type="hidden" id="Type" value="Private" />
     </div>
