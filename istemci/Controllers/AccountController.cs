@@ -17,12 +17,14 @@ namespace chat_site_istemci.Controllers
         private readonly DatabaseContext _databaseContext;
         private readonly IConfiguration _configuration;
         private readonly SocketService _socketService;
+        private Chats _chats;
 
-        public AccountController(DatabaseContext databaseContext, IConfiguration configuration, SocketService socketService)
+        public AccountController(DatabaseContext databaseContext, IConfiguration configuration, SocketService socketService,Chats chats)
         {
             _databaseContext = databaseContext;
             _configuration = configuration;
             _socketService = socketService;
+            _chats = chats;
         }
 
         [AllowAnonymous]
@@ -122,6 +124,7 @@ namespace chat_site_istemci.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = _databaseContext.Users.SingleOrDefault(x => x.UserId == new Guid(userId));
+            _chats.chats.Clear();
 
             if (user != null)
             {

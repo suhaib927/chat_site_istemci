@@ -12,8 +12,8 @@ using chat_site_istemci.Entities;
 namespace chat_site_istemci.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20241221215209_deleteFaukedNessages")]
-    partial class deleteFaukedNessages
+    [Migration("20241227044331_AddGroupSupport")]
+    partial class AddGroupSupport
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,12 +78,16 @@ namespace chat_site_istemci.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("GroupId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("MessageContent")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ReceiverId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("SenderId")
                         .HasColumnType("uniqueidentifier");
@@ -98,11 +102,14 @@ namespace chat_site_istemci.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("MessageId");
 
-                    b.HasIndex("ReceiverId");
-
                     b.HasIndex("SenderId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Messages");
                 });
@@ -162,19 +169,15 @@ namespace chat_site_istemci.Migrations
 
             modelBuilder.Entity("chat_site_istemci.Entities.Message", b =>
                 {
-                    b.HasOne("chat_site_istemci.Entities.User", "Receiver")
-                        .WithMany("ReceivedMessages")
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("chat_site_istemci.Entities.User", "Sender")
                         .WithMany("SentMessages")
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Receiver");
+                    b.HasOne("chat_site_istemci.Entities.User", null)
+                        .WithMany("ReceivedMessages")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Sender");
                 });

@@ -5,9 +5,9 @@ namespace chat_site_istemci.Services
 {
     public class ChatHub : Hub
     {
-        public async Task SendMessage(User user, Message message,string sentAt)
+        public async Task SendMessage(User user, Message message,string sentAt,Guid myId)
         {
-            await Clients.All.SendAsync("ReceiveMessage", user, message, sentAt);
+            await Clients.All.SendAsync("ReceiveMessage", user, message, sentAt , myId);
         }
     }
 

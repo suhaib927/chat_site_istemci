@@ -6,6 +6,8 @@ using Newtonsoft.Json;
 using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 using System.Threading;
 
 namespace chat_site_istemci.Services
@@ -17,8 +19,11 @@ namespace chat_site_istemci.Services
         private static bool _isConnected = false;
         private Chats _chats;
         private IHubContext<ChatHub> _hubContext;
-        public SocketService(Chats chats, IHubContext<ChatHub> hubContext)
+        private readonly IServiceProvider _serviceProvider;
+
+        public SocketService(IServiceProvider serviceProvider, Chats chats, IHubContext<ChatHub> hubContext)
         {
+            _serviceProvider = serviceProvider;
             _chats = chats;
             _hubContext = hubContext;
         }
@@ -61,23 +66,25 @@ namespace chat_site_istemci.Services
             try
             {
                 if (_socket != null && _socket.Connected)
-                    if (_socket != null && _socket.Connected)
+                {
+                    string messageJson = Newtonsoft.Json.JsonConvert.SerializeObject(message, new Newtonsoft.Json.JsonSerializerSettings
                     {
-                        // تحويل الكائن إلى JSON
-                        string messageJson = JsonConvert.SerializeObject(message);
+                        ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                    });
 
-                        // تحويل الـ JSON إلى bytes لإرسالها عبر الـ Socket
-                        byte[] messageBytes = Encoding.UTF8.GetBytes(messageJson);
+
+                    // تحويل الـ JSON إلى bytes لإرسالها عبر الـ Socket
+                    byte[] messageBytes = Encoding.UTF8.GetBytes(messageJson);
 
                         // إرسال الرسالة (بما في ذلك كل التفاصيل) كوحدة واحدة
-                        _socket.Send(messageBytes);
+                    _socket.Send(messageBytes);
 
-                        Console.WriteLine("Message sent to server.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Socket is not connected. Cannot send message.");
-                    }
+                    Console.WriteLine("Message sent to server.");
+                }
+                else
+                {
+                    Console.WriteLine("Socket is not connected. Cannot send message.");
+                }
             }
             catch (Exception ex)
             {
@@ -101,9 +108,24 @@ namespace chat_site_istemci.Services
                     {
                         string receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                         Message message = JsonConvert.DeserializeObject<Message>(receivedMessage);
+                        using (var scope = _serviceProvider.CreateScope())
+                        {
+                            var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+                            message.Sender = dbContext.Users.SingleOrDefault(u => u.UserId == message.SenderId);
+                        }
+                        _hubContext.Clients.All.SendAsync("ReceiveMessage", message.Sender, message,message.SentAt.ToString(),message.ReceiverId);
 
-                        _hubContext.Clients.All.SendAsync("ReceiveMessage", message.Sender, message,message.SentAt.ToString());
-                        var existingChat = _chats.chats.FirstOrDefault(c => c.ChatKey == message.SenderId.ToString());
+
+                        string chat;
+                        if (message.Type == "Private")
+                        {
+                            chat = message.SenderId.ToString();
+                        }
+                        else
+                        {
+                            chat = message.GroupId.ToString();
+                        }
+                        var existingChat = _chats.chats.FirstOrDefault(c => c.ChatKey == chat);
                         if (existingChat != null)
                         {
                             existingChat.Messages.Add(message);
@@ -112,8 +134,9 @@ namespace chat_site_istemci.Services
                         {
                             var newChat = new Chat
                             {
-                                ChatKey = message.SenderId.ToString(),
+                                ChatKey = chat,
                             };
+                            newChat.Messages.Add(message);
                             _chats.chats.Add(newChat);
                         }
 
