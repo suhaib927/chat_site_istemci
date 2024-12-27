@@ -10,12 +10,10 @@ namespace chat_site_istemci.Entities
         [Key]
         public Guid MessageId { get; set; }
 
-        [Required]
-        [ForeignKey(nameof(Sender))]
-        public Guid SenderId { get; set; }
-        public User Sender { get; set; } // User who sent the message
+        public string? SenderId { get; set; }
+        public User Sender { get; set; }
 
-        public string ReceiverId { get; set; }
+        public string? ReceiverId { get; set; }
 
         public string? GroupId { get; set; }
 

@@ -1,0 +1,16 @@
+﻿@model CreateGroupViewModel
+
+<div class="container mt-5">
+    <h3>Create New Group</h3>
+    <form method="post" action="/Group/Create">
+        <div class="form-group mb-3">
+            <label for="GroupName">Group Name</label>
+            <input type="text" class="form-control" id="GroupName" name="GroupName" placeholder="Enter group name" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="GroupImageUrl">Group Image URL</label>
+            <input type="text" class="form-control" id="GroupImageUrl" name="GroupImageUrl" placeholder="Enter group image URL (optional)">
+        </div>
+        <button type="submit" class="btn btn-primary">Create Group</button>
+    </form>
+</div>

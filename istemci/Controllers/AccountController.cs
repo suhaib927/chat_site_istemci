@@ -99,10 +99,29 @@ namespace chat_site_istemci.Controllers
             string hashedPassword = DoMD5HashedString(model.Password);
             if (ModelState.IsValid)
             {
+                string profileImageFileName = "/images/default.jpg"; 
+                if (model.ProfileImage != null)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    profileImageFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ProfileImage.FileName);
+                    var filePath = Path.Combine(uploadsFolder, profileImageFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        model.ProfileImage.CopyTo(fileStream);
+                    }
+                }
+
                 User user = new()
                 {
                     Username = model.Username,
-                    Password = hashedPassword
+                    Password = hashedPassword,
+                    ProfileImageFileName = profileImageFileName
                 };
                 _databaseContext.Users.Add(user);
                 int affectedRowCount = _databaseContext.SaveChanges();

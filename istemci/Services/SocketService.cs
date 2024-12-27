@@ -27,29 +27,24 @@ namespace chat_site_istemci.Services
             _chats = chats;
             _hubContext = hubContext;
         }
-        // اتصال بالخادم
         public void ConnectToServer(string userId)
         {
             try
             {
-                // تحقق من إذا كان هناك اتصال سابق قبل إنشاء اتصال جديد
                 if (_isConnected)
                 {
                     Console.WriteLine("Already connected to the server.");
                     return;
                 }
 
-                // إنشاء socket جديد
                 _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                _socket.Connect("127.0.0.1", 5000);  // الاتصال بالخادم (IP والـ Port)
+                _socket.Connect("127.0.0.1", 5000);
 
                 byte[] messageBytes = Encoding.UTF8.GetBytes(userId);
                 _socket.Send(messageBytes);
 
-                // تعيين حالة الاتصال إلى true
                 _isConnected = true;
 
-                // بدء الاستماع للرسائل من الخادم في thread منفصل
                 _listenerThread = new Thread(ListenToServer);
                 _listenerThread.Start();
                 Console.WriteLine("Connected to server and started listening for messages.");
@@ -60,7 +55,6 @@ namespace chat_site_istemci.Services
             }
         }
 
-        // إرسال رسالة إلى الخادم
         public void SendMessageToServer(Message message)
         {
             try
@@ -73,10 +67,8 @@ namespace chat_site_istemci.Services
                     });
 
 
-                    // تحويل الـ JSON إلى bytes لإرسالها عبر الـ Socket
                     byte[] messageBytes = Encoding.UTF8.GetBytes(messageJson);
 
-                        // إرسال الرسالة (بما في ذلك كل التفاصيل) كوحدة واحدة
                     _socket.Send(messageBytes);
 
                     Console.WriteLine("Message sent to server.");
@@ -92,7 +84,6 @@ namespace chat_site_istemci.Services
             }
         }
 
-        // الاستماع للرسائل الواردة من الخادم
         private void ListenToServer()
         {
             try
@@ -102,7 +93,6 @@ namespace chat_site_istemci.Services
 
                 while (_socket.Connected)
                 {
-                    // قراءة الرسائل الواردة من الخادم
                     bytesRead = _socket.Receive(buffer);
                     if (bytesRead > 0)
                     {
@@ -111,9 +101,9 @@ namespace chat_site_istemci.Services
                         using (var scope = _serviceProvider.CreateScope())
                         {
                             var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                            message.Sender = dbContext.Users.SingleOrDefault(u => u.UserId == message.SenderId);
+                            message.Sender = dbContext.Users.SingleOrDefault(u => u.UserId == Guid.Parse(message.SenderId));
                         }
-                        _hubContext.Clients.All.SendAsync("ReceiveMessage", message.Sender, message,message.SentAt.ToString(),message.ReceiverId);
+                        _hubContext.Clients.All.SendAsync("ReceiveMessage", message,message.SentAt.ToString(),message.ReceiverId);
 
 
                         string chat;
@@ -150,17 +140,14 @@ namespace chat_site_istemci.Services
             }
             finally
             {
-                // إغلاق الاتصال إذا كان هناك أي خطأ أو تم قطع الاتصال
                 Disconnect();
             }
         }
 
-        // قطع الاتصال بالخادم
         public void Disconnect()
         {
             try
             {
-                // تحقق من وجود الاتصال أولاً
                 if (_socket != null && _socket.Connected)
                 {
                     _socket.Shutdown(SocketShutdown.Both);
@@ -173,7 +160,6 @@ namespace chat_site_istemci.Services
                     Console.WriteLine("No connection to disconnect.");
                 }
 
-                // إيقاف الـ thread الخاص بالاستماع
                 if (_listenerThread != null && _listenerThread.IsAlive)
                 {
                     _listenerThread.Abort();

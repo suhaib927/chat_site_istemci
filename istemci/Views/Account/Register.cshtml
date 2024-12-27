@@ -26,6 +26,13 @@
                 <span asp-validation-for="RePassword" class="text-danger small"></span>
             </div>
 
+            <div class="form-group mb-3">
+                <label asp-for="ProfileImage" class="form-label">Profile Image</label>
+                <input asp-for="ProfileImage" type="file" class="form-control" />
+                <span asp-validation-for="ProfileImage" class="text-danger small"></span>
+            </div>
+
+
             <div class="form-group d-grid mb-3">
                 <button type="submit" class="btn btn-primary d-block"><i class="fa-solid fa-user me-2"></i>Register</button>
             </div>

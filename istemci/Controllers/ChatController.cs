@@ -82,7 +82,7 @@ public class ChatController : Controller
     [HttpPost]
     public async Task<IActionResult> SendMessage(string MessageContent, Guid ReceiverId, string Type, Guid GroupId, Guid MyId)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         Guid receiverId;
         if (GroupId != Guid.Parse("00000000-0000-0000-0000-000000000000"))
@@ -95,7 +95,7 @@ public class ChatController : Controller
             receiverId = ReceiverId;
         }
 
-        var sender = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == userId);
+        var sender = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == Guid.Parse(userId));
         var receiver = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == ReceiverId);
         var group = await _databaseContext.Groups.SingleOrDefaultAsync(u => u.GroupId == GroupId);
 
@@ -103,6 +103,7 @@ public class ChatController : Controller
         {
             MessageId = Guid.NewGuid(),
             SenderId = userId,
+            Sender = sender,
             ReceiverId = ReceiverId.ToString(),
             GroupId = GroupId.ToString(),
             MessageContent = MessageContent,
@@ -127,18 +128,6 @@ public class ChatController : Controller
             _chats.chats.Add(newChat);
         }
 
-
-        try
-        {
-            await _databaseContext.Messages.AddAsync(message);
-            await _databaseContext.SaveChangesAsync();
-        }
-        catch (DbUpdateException ex)
-        {
-            Console.WriteLine($"Error saving user: {ex.InnerException?.Message}");
-            throw;
-        }
-
         try
         {
             _socketService.SendMessageToServer(message);
@@ -152,57 +141,5 @@ public class ChatController : Controller
         return Json(new { message = message, user = receiver, group = group, sentAt = message.SentAt.ToString(), myId = MyId });
     }
 
-    [HttpPost]
-    public async Task<IActionResult> GroupId(string groupId)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (string.IsNullOrEmpty(groupId) || string.IsNullOrEmpty(userId))
-        {
-            return BadRequest(new { message = "GroupId and UserId are required." });
-        }
-
-        try
-        {
-            // تحقق من وجود المجموعة
-            var group = await _databaseContext.Groups.FindAsync(Guid.Parse(groupId));
-            if (group == null)
-            {
-                return NotFound(new { message = "Group not found." });
-            }
-
-            // تحقق من وجود المستخدم
-            var user = await _databaseContext.Users.FindAsync(Guid.Parse(userId));
-            if (user == null)
-            {
-                return NotFound(new { message = "User not found." });
-            }
-
-            // تحقق إذا كان المستخدم موجودًا بالفعل في المجموعة
-            var existingMember = await _databaseContext.GroupMembers
-                .FirstOrDefaultAsync(gm => gm.GroupId == group.GroupId && gm.UserId == user.UserId);
-
-            if (existingMember != null)
-            {
-                return Conflict(new { message = "User is already a member of the group." });
-            }
-
-            // إضافة العضو إلى جدول GroupMembers
-            var newMember = new GroupMember
-            {
-                GroupMemberId = Guid.NewGuid(),
-                GroupId = group.GroupId,
-                UserId = user.UserId
-            };
-
-            await _databaseContext.GroupMembers.AddAsync(newMember);
-            await _databaseContext.SaveChangesAsync();
-
-            return Json(new { GroupId = group.GroupId, GroupImageUrl = group.GroupImageUrl, GroupName = group.GroupName });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "An error occurred.", details = ex.Message });
-        }
-    }
+    
 }

@@ -83,11 +83,10 @@ namespace chat_site_istemci.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReceiverId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("SenderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SenderId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("SentAt")
                         .HasColumnType("datetime2");
@@ -99,14 +98,7 @@ namespace chat_site_istemci.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("MessageId");
-
-                    b.HasIndex("SenderId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Messages");
                 });
@@ -119,9 +111,6 @@ namespace chat_site_istemci.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Ip")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsOnline")
                         .HasColumnType("bit");
@@ -164,21 +153,6 @@ namespace chat_site_istemci.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("chat_site_istemci.Entities.Message", b =>
-                {
-                    b.HasOne("chat_site_istemci.Entities.User", "Sender")
-                        .WithMany("SentMessages")
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("chat_site_istemci.Entities.User", null)
-                        .WithMany("ReceivedMessages")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Sender");
-                });
-
             modelBuilder.Entity("chat_site_istemci.Entities.Group", b =>
                 {
                     b.Navigation("Members");
@@ -187,10 +161,6 @@ namespace chat_site_istemci.Migrations
             modelBuilder.Entity("chat_site_istemci.Entities.User", b =>
                 {
                     b.Navigation("GroupMemberships");
-
-                    b.Navigation("ReceivedMessages");
-
-                    b.Navigation("SentMessages");
                 });
 #pragma warning restore 612, 618
         }

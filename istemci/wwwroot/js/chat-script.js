@@ -14,7 +14,6 @@ function selectChat(element) {
         });
 }
 function sendMessage() {
-    console.log('groupId:', document.getElementById('groupId').value);
     var messageContent = document.getElementById('message').value;
     var receiverId = document.getElementById('ReceiverId').value;
     var messageType = document.getElementById('Type').value;
@@ -40,23 +39,33 @@ function sendMessage() {
             var group = response.group;
             var myId = response.myId;
 
-            var chatClass = message.senderId != myId ? "text-right" : "";
-            var messageClass = message.senderId != myId ? "other-message float-right" : "my-message";
-            var newMessage = '<li class="clearfix ' + chatClass + '">' +
-                '<div class="message-data ' + message.type + '">' +
-                '<span class="message-data-time">' + sentAt + '</span>';
+            const chatClass = message.senderId !== myId ? "text-right" : "";
+            const messageClass = message.senderId !== myId ? "other-message float-right" : "my-message";
+            const chatHistory = document.querySelector(".chat-history ul");
 
-            // عرض صورة المستخدم إذا كان هو المرسل
-            //if (message.senderId != myId) {
-            //    newMessage += '<img src="' + message.profileImageFileName + '" alt="avatar">';
-            //}
+            const li = document.createElement("li");
+            li.classList.add("clearfix");
 
-            newMessage += '</div>' +
-                '<div class="message ' + messageClass + '">' + message.messageContent + '</div>' +
-                '</li>';
-            console.log('Response received:', newMessage);
-            // إضافة الرسالة الجديدة إلى عنصر <ul> في واجهة المحادثة
-            $('.chat-history ul').append(newMessage);
+            li.innerHTML = `
+<div class="message-container ${chatClass}">
+   
+    <div class="message-content ${messageClass}">
+        <div class="message-header">
+            <span class="message-data-name">${message.sender.username}</span>
+        </div>
+
+        <div class="message-text">
+            ${message.messageContent}
+        </div>
+
+        <div class="message-time">
+            ${sentAt}
+        </div>
+    </div>
+</div>
+`;
+
+            chatHistory.appendChild(li);
 
 
             document.getElementById('message').value = ''; // إفراغ حقل الرسالة
@@ -69,7 +78,7 @@ function JoinGroup() {
 
     $.ajax({
         type: "post",
-        url: "/Chat/GroupId/", 
+        url: "/Group/GroupId/", 
         data: {
             GroupId: groupId
         },
@@ -77,9 +86,6 @@ function JoinGroup() {
             var GroupId = response.groupId; 
             var GroupImageUrl = response.groupImageUrl; 
             var GroupName = response.groupName;
-            console.log('GroupId', GroupId);
-            console.log('GroupImageUrl', GroupImageUrl);
-            console.log('GroupName', GroupName);
 
             
             var newGroup = `
@@ -112,7 +118,8 @@ const connection = new signalR.HubConnectionBuilder()
     .withUrl("/chatHub")
     .build();
 
-connection.on("ReceiveMessage", (user, message, sentAt, myId) => {
+connection.on("ReceiveMessage", (message, sentAt, myId) => {
+    console.log('message', message);
     let chat = null;
     if (message.type === "Private") {
         chat = message.senderId;
@@ -130,24 +137,31 @@ connection.on("ReceiveMessage", (user, message, sentAt, myId) => {
         li.classList.add("clearfix");
 
         li.innerHTML = `
-        <div class="message-data ${chatClass}">
-            <span class="message-data-time">${sentAt}</span>
-            ${message.senderId !== myId
-                ? `<img src="${user.profileImageFileName}" alt="avatar">
-                       <span class="message-data-name">${user.username}</span>`
+<div class="message-container ${chatClass}">
+    ${message.senderId !== myId
+                ? `<img src="${message.sender.profileImageFileName}" alt="avatar" class="message-avatar">`
                 : ""
             }
+    <div class="message-content ${messageClass}">
+        <div class="message-header">
+            <span class="message-data-name">${message.sender.username}</span>
         </div>
-        <div class="message ${messageClass}">${message.messageContent}</div>
-        `;
-        console.log('li:', li);
+
+        <div class="message-text">
+            ${message.messageContent}
+        </div>
+
+        <div class="message-time">
+            ${sentAt}
+        </div>
+    </div>
+</div>
+`;
 
         chatHistory.appendChild(li);
 
-        // تحريك شريط التمرير لأسفل عند إضافة رسالة جديدة
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
 });
-
 
 connection.start().catch(err => console.error(err.toString()));

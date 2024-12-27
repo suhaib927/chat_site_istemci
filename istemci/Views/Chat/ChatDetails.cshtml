@@ -31,19 +31,29 @@
         <ul class="m-b-0">
             @foreach (var message in Model.Messages)
             {
-                var chatClass = message.SenderId != Model.myId ? "text-right" : "";
-                var messageClass = message.SenderId != Model.myId ? "other-message float-right" : "my-message";
+                var chatClass = message.SenderId != Model.myId.ToString() ? "text-right" : "";
+                var messageClass = message.SenderId != Model.myId.ToString() ? "other-message float-right" : "my-message";
 
                 <li class="clearfix">
-                    <div class="message-data @chatClass">
-                        <span class="message-data-time">@message.SentAt</span>
-                        @if (message.SenderId != Model.myId)
+                    <div class="message-container @chatClass">
+                        @if (message.SenderId != Model.myId.ToString())
                         {
-                            <img src="@message.Sender.ProfileImageFileName" alt="avatar">
-                            <span class="message-data-name">@message.Sender.Username</span>
+                            <img src="@message.Sender.ProfileImageFileName" alt="avatar" class="message-avatar">
                         }
+                        <div class="message-content @messageClass">
+                            <div class="message-header">
+                                <span class="message-data-name">@message.Sender.Username</span>
+                            </div>
+
+                            <div class="message-text">
+                                @message.MessageContent
+                            </div>
+
+                            <div class="message-time">
+                                @message.SentAt
+                            </div>
+                        </div>
                     </div>
-                    <div class="message @messageClass">@message.MessageContent</div>
                 </li>
             }
         </ul>
