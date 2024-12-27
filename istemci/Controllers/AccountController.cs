@@ -17,12 +17,14 @@ namespace chat_site_istemci.Controllers
         private readonly DatabaseContext _databaseContext;
         private readonly IConfiguration _configuration;
         private readonly SocketService _socketService;
+        private Chats _chats;
 
-        public AccountController(DatabaseContext databaseContext, IConfiguration configuration, SocketService socketService)
+        public AccountController(DatabaseContext databaseContext, IConfiguration configuration, SocketService socketService,Chats chats)
         {
             _databaseContext = databaseContext;
             _configuration = configuration;
             _socketService = socketService;
+            _chats = chats;
         }
 
         [AllowAnonymous]
@@ -97,10 +99,29 @@ namespace chat_site_istemci.Controllers
             string hashedPassword = DoMD5HashedString(model.Password);
             if (ModelState.IsValid)
             {
+                string profileImageFileName = "/images/default.jpg"; 
+                if (model.ProfileImage != null)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    profileImageFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ProfileImage.FileName);
+                    var filePath = Path.Combine(uploadsFolder, profileImageFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        model.ProfileImage.CopyTo(fileStream);
+                    }
+                }
+
                 User user = new()
                 {
                     Username = model.Username,
-                    Password = hashedPassword
+                    Password = hashedPassword,
+                    ProfileImageFileName = profileImageFileName
                 };
                 _databaseContext.Users.Add(user);
                 int affectedRowCount = _databaseContext.SaveChanges();
@@ -122,6 +143,7 @@ namespace chat_site_istemci.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = _databaseContext.Users.SingleOrDefault(x => x.UserId == new Guid(userId));
+            _chats.chats.Clear();
 
             if (user != null)
             {

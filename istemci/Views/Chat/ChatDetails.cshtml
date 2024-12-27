@@ -1,44 +1,71 @@
 ﻿@model ChatViewModel
-
 <div class="chat">
+    <!-- Header -->
     <div class="chat-header clearfix">
         <div class="row">
             <div class="col-lg-6">
-                <img src="@Model.user.ProfileImageFileName" alt="avatar">
-                <div class="chat-about">
-                    <h6 class="m-b-0">@Model.user.Username</h6>
-                    <small>@Model.user.CreatedAt</small>
-                </div>
+                @if (Model.group != null)
+                {
+                    <!-- Group Header -->
+                    <img src="@Model.group.GroupImageUrl" alt="Group Avatar">
+                    <div class="chat-about">
+                        <h6 class="m-b-0">@Model.group.GroupName</h6>
+                        <small>Created at: @Model.group.CreatedAt</small>
+                    </div>
+                }
+                else
+                {
+                    <!-- Private Chat Header -->
+                    <img src="@Model.user.ProfileImageFileName" alt="User Avatar">
+                    <div class="chat-about">
+                        <h6 class="m-b-0">@Model.user.Username</h6>
+                        <small>@Model.user.CreatedAt</small>
+                    </div>
+                }
             </div>
         </div>
     </div>
+
+    <!-- Messages -->
     <div class="chat-history">
         <ul class="m-b-0">
             @foreach (var message in Model.Messages)
             {
-                var chatClass = message.SenderId == Model.user.UserId ? "text-right" : "";
-                var messageClass = message.SenderId == Model.user.UserId ? "other-message float-right" : "my-message";
-                
-                
-                <li class="clearfix ">
-                    <div class="message-data @chatClass">
-                        <span class="message-data-time">@message.SentAt</span>
-                        @if (message.SenderId == Model.user.UserId)
+                var chatClass = message.SenderId != Model.myId.ToString() ? "text-right" : "";
+                var messageClass = message.SenderId != Model.myId.ToString() ? "other-message float-right" : "my-message";
+
+                <li class="clearfix">
+                    <div class="message-container @chatClass">
+                        @if (message.SenderId != Model.myId.ToString())
                         {
-                            <img src="@Model.user.ProfileImageFileName" alt="avatar">
+                            <img src="@message.Sender.ProfileImageFileName" alt="avatar" class="message-avatar">
                         }
+                        <div class="message-content @messageClass">
+                            <div class="message-header">
+                                <span class="message-data-name">@message.Sender.Username</span>
+                            </div>
+
+                            <div class="message-text">
+                                @message.MessageContent
+                            </div>
+
+                            <div class="message-time">
+                                @message.SentAt
+                            </div>
+                        </div>
                     </div>
-                    <div class="message @messageClass">@message.MessageContent</div>
                 </li>
             }
         </ul>
     </div>
+
+    <!-- Message Input -->
     <div class="chat-message mb-3">
-            <!-- تعديل الزر لاستخدام onclick -->
         <button type="button" id="btnSendMessage" onclick="sendMessage()"> <i class="fas fa-paper-plane"></i></button>
         <input type="text" id="message" name="MessageContent" placeholder="Enter text here..." aria-label="" aria-describedby="basic-addon1" autocomplete="off">
-        <input type="hidden" id="ReceiverId" value="@Model.user.UserId.ToString()" />
-        <input type="hidden" id="Type" value="Private" />
+        <input type="hidden" id="ReceiverId" value="@Model.user?.UserId.ToString()" />
+        <input type="hidden" id="groupId" value="@Model.group?.GroupId.ToString()" />
+        <input type="hidden" id="MyId" value="@Model.myId.ToString()" />
+        <input type="hidden" id="Type" value="@(Model.group != null ? "Group" : "Private")" />
     </div>
 </div>
-

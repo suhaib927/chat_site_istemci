@@ -12,8 +12,8 @@ using chat_site_istemci.Entities;
 namespace chat_site_istemci.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20241221215209_deleteFaukedNessages")]
-    partial class deleteFaukedNessages
+    [Migration("20241227131441_NewDataMigration")]
+    partial class NewDataMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,15 +78,18 @@ namespace chat_site_istemci.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("GroupId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("MessageContent")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ReceiverId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ReceiverId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("SenderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SenderId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("SentAt")
                         .HasColumnType("datetime2");
@@ -100,10 +103,6 @@ namespace chat_site_istemci.Migrations
 
                     b.HasKey("MessageId");
 
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
-
                     b.ToTable("Messages");
                 });
 
@@ -115,9 +114,6 @@ namespace chat_site_istemci.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Ip")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsOnline")
                         .HasColumnType("bit");
@@ -160,25 +156,6 @@ namespace chat_site_istemci.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("chat_site_istemci.Entities.Message", b =>
-                {
-                    b.HasOne("chat_site_istemci.Entities.User", "Receiver")
-                        .WithMany("ReceivedMessages")
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("chat_site_istemci.Entities.User", "Sender")
-                        .WithMany("SentMessages")
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
-                });
-
             modelBuilder.Entity("chat_site_istemci.Entities.Group", b =>
                 {
                     b.Navigation("Members");
@@ -187,10 +164,6 @@ namespace chat_site_istemci.Migrations
             modelBuilder.Entity("chat_site_istemci.Entities.User", b =>
                 {
                     b.Navigation("GroupMemberships");
-
-                    b.Navigation("ReceivedMessages");
-
-                    b.Navigation("SentMessages");
                 });
 #pragma warning restore 612, 618
         }
