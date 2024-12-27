@@ -103,7 +103,6 @@ public class ChatController : Controller
         {
             MessageId = Guid.NewGuid(),
             SenderId = userId,
-            Sender = sender,
             ReceiverId = ReceiverId.ToString(),
             GroupId = GroupId.ToString(),
             MessageContent = MessageContent,
