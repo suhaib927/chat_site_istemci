@@ -6,9 +6,8 @@ using Newtonsoft.Json;
 using System;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.Json.Serialization;
-using System.Text.Json;
-using System.Threading;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace chat_site_istemci.Services
 {
@@ -61,6 +60,7 @@ namespace chat_site_istemci.Services
             {
                 if (_socket != null && _socket.Connected)
                 {
+                    message.MessageContent = Encrypt(message.MessageContent);
                     string messageJson = Newtonsoft.Json.JsonConvert.SerializeObject(message, new Newtonsoft.Json.JsonSerializerSettings
                     {
                         ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -70,7 +70,7 @@ namespace chat_site_istemci.Services
                     byte[] messageBytes = Encoding.UTF8.GetBytes(messageJson);
 
                     _socket.Send(messageBytes);
-
+                    message.MessageContent = Decrypt(message.MessageContent);
                     Console.WriteLine("Message sent to server.");
                 }
                 else
@@ -98,6 +98,9 @@ namespace chat_site_istemci.Services
                     {
                         string receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                         Message message = JsonConvert.DeserializeObject<Message>(receivedMessage);
+
+                        message.MessageContent = Decrypt(message.MessageContent);
+
                         using (var scope = _serviceProvider.CreateScope())
                         {
                             var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
@@ -170,5 +173,19 @@ namespace chat_site_istemci.Services
                 Console.WriteLine($"Error disconnecting from server: {ex.Message}");
             }
         }
+        public string Encrypt(string plainText)
+        {
+            byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
+            byte[] encryptedBytes = ProtectedData.Protect(plainBytes, null, DataProtectionScope.LocalMachine);
+            return Convert.ToBase64String(encryptedBytes);
+        }
+
+        public string Decrypt(string encryptedText)
+        {
+            byte[] encryptedBytes = Convert.FromBase64String(encryptedText);
+            byte[] plainBytes = ProtectedData.Unprotect(encryptedBytes, null, DataProtectionScope.LocalMachine);
+            return Encoding.UTF8.GetString(plainBytes);
+        }
+
     }
 }
