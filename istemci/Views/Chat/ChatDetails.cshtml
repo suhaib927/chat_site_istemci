@@ -66,6 +66,7 @@
         <input type="hidden" id="ReceiverId" value="@Model.user?.UserId.ToString()" />
         <input type="hidden" id="groupId" value="@Model.group?.GroupId.ToString()" />
         <input type="hidden" id="MyId" value="@Model.myId.ToString()" />
-        <input type="hidden" id="Type" value="@(Model.group != null ? "Group" : "Private")" />
+        <input type="hidden" id="Type" value="@(Model.group != null ? (Model.group.GroupId.ToString() == Model.broadcast ? "Broadcast" : "Group") : "Private")" />
+
     </div>
 </div>

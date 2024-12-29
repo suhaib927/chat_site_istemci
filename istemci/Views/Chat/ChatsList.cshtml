@@ -81,18 +81,15 @@
 
         <div id="broadcast" class="chat-list-section" style="display: none;">
             <ul class="list-unstyled chat-list mt-2 mb-0">
-                @* @foreach (var chat in Model.Where(c => c.Type == "broadcast"))
-                {
-                <li class="clearfix" onclick="selectChat('@chat.UserId')">
-                <img src="@chat.ProfileImageFileName" alt="avatar">
-                <div class="about">
-                <div class="name">@chat.Username</div>
-                <div class="status">
-                <span>Broadcast Message</span>
-                </div>
-                </div>
+                <li class="clearfix" onclick="selectChat('@Model.Broadcast')">
+                    <img src="~/images/path_to_broadcast_image.jpg" alt="avatar">
+                    <div class="about">
+                        <div class="name">Broadcast</div>
+                        <div class="status">
+                            <span>Group Chat</span>
+                        </div>
+                    </div>
                 </li>
-                } *@
             </ul>
         </div>
     </div>
