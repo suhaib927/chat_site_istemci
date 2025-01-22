@@ -1,8 +1,21 @@
 ﻿let currentChatId = null;
+toastr.options = {
+    "closeButton": true,
+    "progressBar": true,
+    "positionClass": "toast-top-right",
+    "showDuration": "300",
+    "hideDuration": "1000",
+    "timeOut": "5000",
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut"
+};
 function selectChat(element) {
     const chatId = element;
     currentChatId = element;
-
+    
     fetch(`/Chat/LoadChat?chatId=${chatId.toString()}`)
         .then(response => response.text())
         .then(data => {
@@ -10,20 +23,21 @@ function selectChat(element) {
         })
         .catch(error => {
             console.error("Error fetching chat:", error);
-            document.getElementById("chat-content").innerHTML = `<p>حدث خطأ أثناء تحميل المحادثة.</p>`;
+            document.getElementById("chat-content").innerHTML = `<p></p>`;
         });
+    
 }
+
 function sendMessage() {
     var messageContent = document.getElementById('message').value;
     var receiverId = document.getElementById('ReceiverId').value;
     var messageType = document.getElementById('Type').value;
     var groupId = document.getElementById('groupId').value;
     var myId = document.getElementById('MyId').value;
-    
-    // إرسال الطلب عبر AJAX
+
     $.ajax({
         type: "post",
-        url: "/Chat/SendMessage/",  // الإرسال إلى الرابط المخصص
+        url: "/Chat/SendMessage/", 
         data: {
             MessageContent: messageContent,
             ReceiverId: receiverId,
@@ -32,8 +46,7 @@ function sendMessage() {
             MyId: myId
         },
         success: function (response) {
-            console.log('Response received:', response);
-            var message = response.message; // استلام الرسالة من الـ response
+            var message = response.message;
             var user = response.user;
             var sentAt = response.sentAt;
             var group = response.group;
@@ -68,7 +81,7 @@ function sendMessage() {
             chatHistory.appendChild(li);
 
 
-            document.getElementById('message').value = ''; // إفراغ حقل الرسالة
+            document.getElementById('message').value = '';
         }
     });
 }
@@ -137,30 +150,37 @@ connection.on("ReceiveMessage", (message, sentAt, myId) => {
         li.classList.add("clearfix");
 
         li.innerHTML = `
-<div class="message-container ${chatClass}">
-    ${message.senderId !== myId
+            <div class="message-container ${chatClass}">
+                ${message.senderId !== myId
                 ? `<img src="${message.sender.profileImageFileName}" alt="avatar" class="message-avatar">`
                 : ""
             }
-    <div class="message-content ${messageClass}">
-        <div class="message-header">
-            <span class="message-data-name">${message.sender.username}</span>
-        </div>
+                <div class="message-content ${messageClass}">
+                    <div class="message-header">
+                        <span class="message-data-name">${message.sender.username}</span>
+                    </div>
 
-        <div class="message-text">
-            ${message.messageContent}
-        </div>
+                    <div class="message-text">
+                        ${message.messageContent}
+                    </div>
 
-        <div class="message-time">
-            ${sentAt}
-        </div>
-    </div>
-</div>
-`;
+                    <div class="message-time">
+                        ${sentAt}
+                    </div>
+                </div>
+            </div>
+            `;
 
         chatHistory.appendChild(li);
 
         chatHistory.scrollTop = chatHistory.scrollHeight;
+    } else {
+
+        toastr.info(`${message.messageContent}`, `New message from ${message.sender.username} To: ${ message.type}`, {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 5000,
+        });
     }
 });
 

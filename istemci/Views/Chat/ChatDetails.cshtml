@@ -10,7 +10,7 @@
                     <img src="@Model.group.GroupImageUrl" alt="Group Avatar">
                     <div class="chat-about">
                         <h6 class="m-b-0">@Model.group.GroupName</h6>
-                        <small>Created at: @Model.group.CreatedAt</small>
+                        <small>Group ID: @Model.group.GroupId</small>
                     </div>
                 }
                 else
@@ -66,6 +66,7 @@
         <input type="hidden" id="ReceiverId" value="@Model.user?.UserId.ToString()" />
         <input type="hidden" id="groupId" value="@Model.group?.GroupId.ToString()" />
         <input type="hidden" id="MyId" value="@Model.myId.ToString()" />
-        <input type="hidden" id="Type" value="@(Model.group != null ? "Group" : "Private")" />
+        <input type="hidden" id="Type" value="@(Model.group != null ? (Model.group.GroupId.ToString() == Model.broadcast ? "Broadcast" : "Group") : "Private")" />
+
     </div>
 </div>

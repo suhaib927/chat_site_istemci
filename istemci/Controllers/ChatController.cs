@@ -4,9 +4,7 @@ using chat_site_istemci.Models;
 using Microsoft.AspNetCore.Authorization;
 using chat_site_istemci.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Security.Claims;
-using System.Text.RegularExpressions;
 
 
 public class ChatController : Controller
@@ -34,7 +32,7 @@ public class ChatController : Controller
             .ToListAsync(),
             groups = await _databaseContext.Groups
             .Where(group => _databaseContext.GroupMembers
-            .Any(member => member.GroupId == group.GroupId && member.UserId.ToString() == currentUserId))
+            .Any(member => member.GroupId == group.GroupId && member.UserId.ToString() == currentUserId && group.GroupId.ToString() != "c977d8ac-691c-41b3-8935-dcf2b0f68c86"))
             .ToListAsync()
 
         };
@@ -52,7 +50,7 @@ public class ChatController : Controller
             {
                 user = await _databaseContext.Users.SingleOrDefaultAsync(u => u.UserId == parsedChatId),
                 group = await _databaseContext.Groups.SingleOrDefaultAsync(u => u.GroupId == parsedChatId),
-                myId = Guid.Parse(currentUserId)
+                myId = Guid.Parse(currentUserId),
             };
 
             var existingChat = _chats.chats.FirstOrDefault(c => c.ChatKey == chatId);
@@ -78,7 +76,6 @@ public class ChatController : Controller
         return BadRequest("Invalid chat ID.");
     }
 
-    // إرسال الرسالة للـ Server
     [HttpPost]
     public async Task<IActionResult> SendMessage(string MessageContent, Guid ReceiverId, string Type, Guid GroupId, Guid MyId)
     {
@@ -112,7 +109,6 @@ public class ChatController : Controller
             Status = false
         };
 
-        // البحث عن محادثة موجودة أو إنشاء جديدة
         var existingChat = _chats.chats.FirstOrDefault(c => c.ChatKey == receiverId.ToString());
         if (existingChat != null)
         {

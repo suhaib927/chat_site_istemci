@@ -63,7 +63,6 @@ namespace chat_site_istemci.Controllers
 
                     HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-                    // الاتصال بالخادم عند تسجيل الدخول
                     _socketService.ConnectToServer(user.UserId.ToString());
 
                     return RedirectToAction("Index", "Chat");
@@ -124,6 +123,14 @@ namespace chat_site_istemci.Controllers
                     ProfileImageFileName = profileImageFileName
                 };
                 _databaseContext.Users.Add(user);
+                var newMember = new GroupMember
+                {
+                    GroupMemberId = Guid.NewGuid(),
+                    GroupId = Guid.Parse("c977d8ac-691c-41b3-8935-dcf2b0f68c86"),
+                    UserId = user.UserId
+                };
+                _databaseContext.GroupMembers.AddAsync(newMember);
+
                 int affectedRowCount = _databaseContext.SaveChanges();
 
                 if (affectedRowCount == 0)
