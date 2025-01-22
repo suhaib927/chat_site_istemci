@@ -32,7 +32,7 @@ public class ChatController : Controller
             .ToListAsync(),
             groups = await _databaseContext.Groups
             .Where(group => _databaseContext.GroupMembers
-            .Any(member => member.GroupId == group.GroupId && member.UserId.ToString() == currentUserId))
+            .Any(member => member.GroupId == group.GroupId && member.UserId.ToString() == currentUserId && group.GroupId.ToString() != "c977d8ac-691c-41b3-8935-dcf2b0f68c86"))
             .ToListAsync()
 
         };

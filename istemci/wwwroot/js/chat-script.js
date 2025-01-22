@@ -176,7 +176,7 @@ connection.on("ReceiveMessage", (message, sentAt, myId) => {
         chatHistory.scrollTop = chatHistory.scrollHeight;
     } else {
 
-        toastr.info(`${message.messageContent}`, `New message from ${message.sender.username}`, {
+        toastr.info(`${message.messageContent}`, `New message from ${message.sender.username} To: ${ message.type}`, {
             closeButton: true,
             progressBar: true,
             timeOut: 5000,
